@@ -2,10 +2,6 @@
   base = "vfwp"
   command = "npm run build"
   publish = "vfwp/dist"
-  [build]
-  base = "vfwp"
-  command = "npm run build"
-  publish = "vfwp/dist"
 
 [[redirects]]
   from = "/*"
