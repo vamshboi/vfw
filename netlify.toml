@@ -1,7 +1,7 @@
 [build]
   base = "vfwp"
   command = "npm run build"
-  publish = "vfwp/dist"
+  publish = "dist"
 
 [[redirects]]
   from = "/*"
