@@ -30,7 +30,7 @@ export default function Donate() {
 
     try {
       // Step 1 — Create order from backend
-      const res = await fetch("http://localhost:5000/create-order", {
+      const res = await fetch("https://vfw-server.onrender.com/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: Number(amount) }),
