@@ -12,6 +12,7 @@ import Donate from "./pages/donate"
 
 import EventsPage from "./events/pages/eventspage";
 import EventDetailPage from "./events/pages/eventdetailpage";
+import TribalMela from "./pages/tribalmela"
 
 function App() {
 
@@ -45,6 +46,7 @@ function App() {
         <Route path="/events/:id" element={<EventDetailPage />} />
         <Route path="/visitings" element={<Visitings />} />
         <Route path="/donate" element={<Donate />} />
+        <Route path="/tribalmela" element={<TribalMela />} />
       </Routes>
 
       {/* global modal */}

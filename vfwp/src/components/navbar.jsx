@@ -7,7 +7,7 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "About", path: "/about" },
   { label: "Our Events", path: "/events" },
-  { label: "Tribal Mela", path: "/visitings" },
+  { label: "Tribal Mela", path: "/tribalmela" },
   { label: "Donate", path: "/donate" },
 ]
 
