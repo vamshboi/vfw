@@ -7,13 +7,12 @@ import AuthDialog from "./components/auth/authdialog";
 import Home from "./pages/home"
 import About from "./pages/about"
 import Events from "./pages/events"
-import Visitings from "./pages/visitings"
+
 import Donate from "./pages/donate"
+import TribalMela from "./pages/tribalmela"
 
 import EventsPage from "./events/pages/eventspage";
 import EventDetailPage from "./events/pages/eventdetailpage";
-import TribalMela from "./pages/tribalmela"
-
 function App() {
 
   // 🔐 auth dialog state
@@ -44,7 +43,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
-        <Route path="/visitings" element={<Visitings />} />
+        
         <Route path="/donate" element={<Donate />} />
         <Route path="/tribalmela" element={<TribalMela />} />
       </Routes>
