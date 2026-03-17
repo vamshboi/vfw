@@ -161,11 +161,27 @@ function DeliveryForm({ cart, total, onBack, onSuccess }) {
         prefill: { name, email, contact: phone },
         notes: { address: `${address}, ${city}, ${state} - ${pincode}` },
         theme: { color: "#FACC15" },
-        handler: function (response) {
-          console.log("Payment Success:", response);
-          setLoading(false);
-          onSuccess({ ...form, paymentId: response.razorpay_payment_id });
-        },
+       handler: function (response) {
+  // Send confirmation email
+  fetch("https://vfw-server.onrender.com/send-confirmation", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      address: form.address,
+      city: form.city,
+      state: form.state,
+      pincode: form.pincode,
+      paymentId: response.razorpay_payment_id,
+      items: cart,
+      total: total,
+    }),
+  });
+  setLoading(false);
+  onSuccess({ ...form, paymentId: response.razorpay_payment_id });
+},
       };
 
       const rzp = new window.Razorpay(options);
