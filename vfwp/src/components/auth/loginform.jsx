@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-
+import { useAuth } from "../../context/useauth";
 const InputField = ({ label, type = "text", value, onChange, error, autoComplete }) => {
   const [focused, setFocused] = useState(false);
   const isFloating = focused || value.length > 0;
@@ -55,7 +55,7 @@ export default function LoginForm({ onSwitchTab, onClose }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
+  const { login } = useAuth();
   const validate = () => {
     const e = {};
     if (!fields.email.trim()) e.email = "Email is required";
@@ -96,8 +96,7 @@ export default function LoginForm({ onSwitchTab, onClose }) {
     }
 
     // store token
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+   login(data.user, data.token);
 
     setLoading(false);
     setSuccess(true);

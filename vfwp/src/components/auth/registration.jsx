@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "../../context/useauth";
 
 const InputField = ({ label, type = "text", value, onChange, error, autoComplete }) => {
   const [focused, setFocused] = useState(false);
@@ -55,6 +56,7 @@ export default function RegisterForm({ onSwitchTab, onClose }) {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { login } = useAuth();
 
   const set = (key) => (e) => setFields((f) => ({ ...f, [key]: e.target.value }));
 
@@ -103,8 +105,7 @@ export default function RegisterForm({ onSwitchTab, onClose }) {
     }
 
     // store token + user
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+    login(data.user, data.token);
 
     setLoading(false);
     setSuccess(true);
