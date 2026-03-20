@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/useauth";
 import { Link } from "react-router-dom";
 
-const API = import.meta.env.VITE_API_URL;
+const API = "https://vfw-server.onrender.com/api";
 
 const SKILLS = [
   "Teaching / Education",

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/useauth";
 
-const API = import.meta.env.VITE_API_URL;
+const API = "https://vfw-server.onrender.com/api";
 
 const FIELD_TYPES = [
   { type: "text", label: "Text Input", icon: "📝" },

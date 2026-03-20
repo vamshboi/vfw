@@ -58,7 +58,7 @@ export default function Donate() {
         },
         handler: function (response) {
           // Save donation to database
-          fetch(`${import.meta.env.VITE_API_URL}/donations`, {
+          fetch(`${"https://vfw-server.onrender.com/api"}/donations`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useEvents } from "../../context/usevents";
 
-const API = import.meta.env.VITE_API_URL;
+const API = "https://vfw-server.onrender.com/api";
 
 const CATEGORY_COLORS = {
   Education: "bg-blue-500/15 text-blue-400 border-blue-500/25",

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/useauth";
 
-const API = import.meta.env.VITE_API_URL;
+const API = "https://vfw-server.onrender.com/api";
 
 const CATEGORIES = ["All", "Paintings", "Handicrafts", "Jewelry", "Artifacts"];
 const CATEGORY_ICONS = { All: "✦", Paintings: "🖼️", Handicrafts: "🏺", Jewelry: "💍", Artifacts: "🪆" };
@@ -152,7 +152,7 @@ function DeliveryForm({ cart, total, onBack, onSuccess }) {
         notes: { address: `${address}, ${city}, ${state} - ${pincode}` },
         theme: { color: "#FACC15" },
         handler: function (response) {
-  fetch(`${import.meta.env.VITE_API_URL}/orders`, {
+  fetch(`${"https://vfw-server.onrender.com/api"}/orders`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
