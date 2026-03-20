@@ -2,20 +2,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useEvents } from "../../context/usevents";
+import { useAuth } from "../../context/useauth";
 import ActivityTimeline from "../../components/events/activitytimeline";
 import EventCard from "../../components/events/eventcard";
 import AdminEventForm from "../../components/events/admineventform";
 
-// ── Role switcher (demo only — replace with real auth) ──
-const ROLES = ["public", "volunteer", "admin"];
-
 export default function EventsPage() {
   const { events, deleteEvent } = useEvents();
-  const [role, setRole] = useState("public");
+  const { isAdmin, isVolunteer, isLoggedIn } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState("All");
-
-  const isAdmin = role === "admin";
 
   const filtered =
     filter === "All"
@@ -67,37 +63,46 @@ export default function EventsPage() {
             </h1>
           </div>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            {/* Demo role switcher */}
-            <div className="flex items-center gap-1 p-1 bg-[#111] rounded-xl border border-white/8">
-              {ROLES.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRole(r)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all duration-200 ${
-                    role === r
-                      ? "bg-[#FACC15] text-black"
-                      : "text-white/40 hover:text-white/70"
-                  }`}
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-
-            {isAdmin && (
-              <button
-                onClick={() => setShowForm(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-[#FACC15] text-black font-['Syne'] font-bold text-sm rounded-xl hover:bg-yellow-300 transition-all duration-200 shadow-lg shadow-[#FACC15]/20"
-              >
-                <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
-                  <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                New Event
-              </button>
-            )}
-          </div>
+          {/* Admin only — New Event button */}
+          {isAdmin && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#FACC15] text-black font-['Syne'] font-bold text-sm rounded-xl hover:bg-yellow-300 transition-all duration-200 shadow-lg shadow-[#FACC15]/20"
+            >
+              <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4">
+                <path d="M8 2v12M2 8h12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              New Event
+            </button>
+          )}
         </motion.div>
+
+        {/* ── Role info banner ── */}
+        {!isLoggedIn && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-4 bg-[#FACC15]/5 rounded-xl border border-[#FACC15]/15 flex items-center gap-3"
+          >
+            <span className="text-lg">💡</span>
+            <p className="text-white/50 text-xs leading-relaxed">
+              <span className="text-[#FACC15] font-semibold">Sign in</span> to apply for upcoming events as a volunteer.
+            </p>
+          </motion.div>
+        )}
+
+        {isVolunteer && !isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20 flex items-center gap-3"
+          >
+            <span className="text-lg">🌟</span>
+            <p className="text-white/50 text-xs leading-relaxed">
+              You're a <span className="text-emerald-400 font-semibold">Volunteer</span> — you can apply for upcoming events below!
+            </p>
+          </motion.div>
+        )}
 
         {/* ── Main two-column layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-10 lg:gap-14 items-start">
@@ -146,6 +151,7 @@ export default function EventsPage() {
                     event={event}
                     index={i}
                     isAdmin={isAdmin}
+                    isVolunteer={isVolunteer}
                     onDelete={deleteEvent}
                   />
                 ))}

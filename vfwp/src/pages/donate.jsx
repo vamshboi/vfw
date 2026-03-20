@@ -30,7 +30,7 @@ export default function Donate() {
 
     try {
       // Step 1 — Create order from backend
-      const res = await fetch("https://vfw-server.onrender.com/create-order", {
+      const res = await fetch("http://localhost:5000/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ amount: Number(amount) }),
@@ -40,7 +40,7 @@ export default function Donate() {
 
       // Step 2 — Open Razorpay checkout
       const options = {
-        key: "rzp_test_SSFrbdbdcHZ2Si", // 🔴 Replace with your Razorpay Key ID
+        key: "rzp_test_xxxxxx", // 🔴 Replace with your Razorpay Key ID
         amount: order.amount,
         currency: order.currency,
         name: "Voice For Welfare",
@@ -57,7 +57,19 @@ export default function Donate() {
           color: "#FACC15",
         },
         handler: function (response) {
-          console.log("Payment Success:", response);
+          // Save donation to database
+          fetch(`${import.meta.env.VITE_API_URL}/donations`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: name,
+              email: email,
+              amount: Number(amount),
+              method: "Razorpay",
+              message: message,
+              paymentId: response.razorpay_payment_id,
+            }),
+          });
           setSuccess(true);
           setLoading(false);
         },

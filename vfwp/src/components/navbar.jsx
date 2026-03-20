@@ -9,6 +9,7 @@ const navLinks = [
   { label: "About", path: "/about" },
   { label: "Our Events", path: "/events" },
   { label: "Tribal Mela", path: "/tribalmela" },
+  { label: "Volunteer", path: "/volunteer" },
   { label: "Donate", path: "/donate" },
 ]
 
@@ -172,15 +173,17 @@ export default function Navbar({ onUserIconClick, onJoinUsClick }) {
                       )}
 
                       {/* Profile */}
-                      <button
-                        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors duration-200 group"
-                      >
+                      <Link
+                         to="/profile"
+                         onClick={() => setProfileOpen(false)}
+                         className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors duration-200 group"
+                        >
                         <svg viewBox="0 0 16 16" fill="none" className="w-4 h-4 text-white/40">
                           <circle cx="8" cy="5" r="3" stroke="currentColor" strokeWidth="1.4" />
                           <path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
                         </svg>
                         <span className="text-white/70 text-xs font-medium group-hover:text-white transition-colors">Profile</span>
-                      </button>
+                      </Link>
 
                       {/* Divider */}
                       <div className="h-px bg-white/8 my-1" />

@@ -1,18 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../context/useauth";
 
-// ─── Mock Product Data ────────────────────────────────────────────────────────
-const PRODUCTS = [
-  { id: 1, name: "Warli Village Scene", artist: "Sushma Gavit", tribe: "Warli", price: 2800, originalPrice: 3500, category: "Paintings", badge: "Bestseller", emoji: "🖼️", description: "Hand-painted Warli art depicting village life, celebrations, and nature in traditional white on terracotta.", image: null, rating: 4.9, reviews: 42, inStock: true },
-  { id: 2, name: "Dhokra Tribal Figurine", artist: "Ramesh Shil", tribe: "Bastar", price: 1850, originalPrice: null, category: "Handicrafts", badge: "Handcrafted", emoji: "🏺", description: "Lost-wax cast brass figurine using 5000-year-old Dhokra craft tradition from Chhattisgarh.", image: null, rating: 4.8, reviews: 28, inStock: true },
-  { id: 3, name: "Gond Painting — Forest Spirit", artist: "Durgabai Vyam", tribe: "Gond", price: 4200, originalPrice: 5000, category: "Paintings", badge: "Award Winning", emoji: "🌿", description: "Vibrant Gond painting with intricate dot patterns depicting the forest deity and tribal folklore.", image: null, rating: 5.0, reviews: 67, inStock: true },
-  { id: 4, name: "Tribal Silver Choker Set", artist: "Kamla Devi", tribe: "Lambadi", price: 1200, originalPrice: null, category: "Jewelry", badge: "New Arrival", emoji: "💍", description: "Handcrafted oxidized silver choker with traditional Lambadi mirror-work and thread embroidery.", image: null, rating: 4.7, reviews: 19, inStock: true },
-  { id: 5, name: "Bamboo Weave Storage Basket", artist: "Suresh Majhi", tribe: "Santhali", price: 680, originalPrice: null, category: "Handicrafts", badge: null, emoji: "🧺", description: "Eco-friendly handwoven bamboo basket using techniques passed down through Santhali generations.", image: null, rating: 4.6, reviews: 35, inStock: true },
-  { id: 6, name: "Pattachitra Story Scroll", artist: "Aparna Moharana", tribe: "Odisha", price: 3600, originalPrice: 4200, category: "Artifacts", badge: "Heritage Craft", emoji: "📜", description: "Traditional cloth-based scroll painting narrating Jagannath mythology in vivid natural pigments.", image: null, rating: 4.9, reviews: 53, inStock: false },
-  { id: 7, name: "Madhubani Fish Painting", artist: "Meena Devi", tribe: "Mithila", price: 1900, originalPrice: null, category: "Paintings", badge: null, emoji: "🐟", description: "Auspicious fish motif in classic Madhubani style — a traditional wedding gift in Bihar.", image: null, rating: 4.8, reviews: 31, inStock: true },
-  { id: 8, name: "Tribal Terracotta Horse", artist: "Mohan Kumbhar", tribe: "Kutch", price: 920, originalPrice: null, category: "Artifacts", badge: null, emoji: "🐴", description: "Hand-molded and kiln-fired terracotta horse — a sacred offering piece used in tribal rituals.", image: null, rating: 4.5, reviews: 14, inStock: true },
-  { id: 9, name: "Beaded Tribal Bracelet", artist: "Radha Bai", tribe: "Bhil", price: 450, originalPrice: null, category: "Jewelry", badge: "Popular", emoji: "📿", description: "Handstrung colorful glass bead bracelet in traditional Bhil geometric patterns from Rajasthan.", image: null, rating: 4.7, reviews: 88, inStock: true },
-];
+const API = import.meta.env.VITE_API_URL;
 
 const CATEGORIES = ["All", "Paintings", "Handicrafts", "Jewelry", "Artifacts"];
 const CATEGORY_ICONS = { All: "✦", Paintings: "🖼️", Handicrafts: "🏺", Jewelry: "💍", Artifacts: "🪆" };
@@ -152,7 +142,7 @@ function DeliveryForm({ cart, total, onBack, onSuccess }) {
       const order = await res.json();
 
       const options = {
-        key: "rzp_test_SSFrbdbdcHZ2Si", // 🔴 Replace with your Razorpay Key ID
+        key: "rzp_test_xxxxxx", // 🔴 Replace with your Razorpay Key ID
         amount: order.amount,
         currency: order.currency,
         name: "Voice For Welfare — Tribal Mela",
@@ -161,11 +151,13 @@ function DeliveryForm({ cart, total, onBack, onSuccess }) {
         prefill: { name, email, contact: phone },
         notes: { address: `${address}, ${city}, ${state} - ${pincode}` },
         theme: { color: "#FACC15" },
-       handler: function (response) {
-  // Send confirmation email
-  fetch("https://vfw-server.onrender.com/send-confirmation", {
+        handler: function (response) {
+  fetch(`${import.meta.env.VITE_API_URL}/orders`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
     body: JSON.stringify({
       name: form.name,
       email: form.email,
@@ -174,14 +166,19 @@ function DeliveryForm({ cart, total, onBack, onSuccess }) {
       city: form.city,
       state: form.state,
       pincode: form.pincode,
-      paymentId: response.razorpay_payment_id,
-      items: cart,
       total: total,
+      items: cart,
+      paymentId: response.razorpay_payment_id,
     }),
   });
   setLoading(false);
   onSuccess({ ...form, paymentId: response.razorpay_payment_id });
 },
+        handler: function (response) {
+          console.log("Payment Success:", response);
+          setLoading(false);
+          onSuccess({ ...form, paymentId: response.razorpay_payment_id });
+        },
       };
 
       const rzp = new window.Razorpay(options);
@@ -492,6 +489,9 @@ function ImpactBanner() {
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function TribalMela() {
   const { cart, addToCart, removeFromCart, updateQty, clearCart, total, count } = useCart();
+  const { isAdmin } = useAuth();
+  const [products, setProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState("featured");
   const [cartOpen, setCartOpen] = useState(false);
@@ -500,15 +500,22 @@ export default function TribalMela() {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    fetch(`${API}/products`)
+      .then((r) => r.json())
+      .then((data) => { setProducts(Array.isArray(data) ? data : []); setProductsLoading(false); })
+      .catch(() => setProductsLoading(false));
+  }, []);
+
   const filtered = useMemo(() => {
-    let result = PRODUCTS;
+    let result = products;
     if (activeCategory !== "All") result = result.filter((p) => p.category === activeCategory);
     if (search.trim()) result = result.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()) || p.artist.toLowerCase().includes(search.toLowerCase()) || p.tribe.toLowerCase().includes(search.toLowerCase()));
     if (sortBy === "price-asc") result = [...result].sort((a, b) => a.price - b.price);
     else if (sortBy === "price-desc") result = [...result].sort((a, b) => b.price - a.price);
-    else if (sortBy === "rating") result = [...result].sort((a, b) => b.rating - a.rating);
+    else if (sortBy === "rating") result = [...result].sort((a, b) => (b.rating || 0) - (a.rating || 0));
     return result;
-  }, [activeCategory, sortBy, search]);
+  }, [activeCategory, sortBy, search, products]);
 
   const handleOrderSuccess = (details) => {
     setCheckoutOpen(false);
@@ -562,7 +569,7 @@ export default function TribalMela() {
             {CATEGORIES.map((cat) => (
               <button key={cat} onClick={() => setActiveCategory(cat)} className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${activeCategory === cat ? "bg-[#FACC15] text-black" : "text-white/40 hover:text-white/70"}`}>
                 <span>{CATEGORY_ICONS[cat]}</span>{cat}
-                <span className="text-[10px] opacity-60">{cat === "All" ? PRODUCTS.length : PRODUCTS.filter(p => p.category === cat).length}</span>
+                <span className="text-[10px] opacity-60">{cat === "All" ? products.length : products.filter(p => p.category === cat).length}</span>
               </button>
             ))}
           </div>
@@ -580,7 +587,17 @@ export default function TribalMela() {
         </div>
 
         {/* Grid */}
-        {filtered.length > 0 ? (
+        {productsLoading ? (
+          <div className="flex items-center justify-center py-24">
+            <div className="flex flex-col items-center gap-4">
+              <svg className="animate-spin w-8 h-8 text-[#FACC15]" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+              </svg>
+              <p className="text-white/30 text-sm">Loading products...</p>
+            </div>
+          </div>
+        ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((product, i) => <ProductCard key={product.id} product={product} index={i} onAddToCart={addToCart} onQuickView={setQuickViewProduct} />)}
           </div>
