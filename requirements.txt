@@ -1,0 +1,216 @@
+MAVEN + GIT + DOCKER EXAM COMMANDS
+====================================
+
+JAVA MAVEN PROJECT
+------------------
+
+1. Clone repository
+git clone <repo-url>
+
+2. Enter project
+cd <repo-name>
+
+3. Create feature branch
+git checkout -b feature/new-feature
+
+4. Check branch
+git branch
+
+5. Check changes
+git status
+
+6. Add changes
+git add .
+
+7. Commit changes
+git commit -m "added feature"
+
+8. Push feature branch
+git push origin feature/new-feature
+
+9. Switch to main
+git checkout main
+
+10. Merge feature
+git merge feature/new-feature
+
+11. Push main
+git push origin main
+
+
+MAVEN BUILD (ECLIPSE)
+---------------------
+
+Eclipse:
+Right-click project
+-> Run As
+-> Maven build...
+-> Goals: package
+-> Run
+
+For a completely fresh build:
+Goals: clean package
+
+
+MAVEN JAR PLUGIN (FOR JAVA DOCKER)
+------------------------------------
+
+Add this inside <build>, after <pluginManagement>:
+
+<plugins>
+    <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+            <archive>
+                <manifest>
+                    <mainClass>com.example.my_maven_project.App</mainClass>
+                </manifest>
+            </archive>
+        </configuration>
+    </plugin>
+</plugins>
+
+Then build:
+clean package
+
+
+JAVA DOCKER
+-----------
+
+Dockerfile:
+
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY target/*.jar app.jar
+CMD ["java", "-jar", "app.jar"]
+
+Build image:
+docker build -t my-maven-app .
+
+Run container:
+docker run --name my-maven-container my-maven-app
+
+If container already exists:
+docker rm my-maven-container
+
+If container is running:
+docker stop my-maven-container
+docker rm my-maven-container
+
+Check containers:
+docker ps
+docker ps -a
+
+Check image:
+docker images
+
+Stop container:
+docker stop my-maven-container
+
+Start stopped container:
+docker start my-maven-container
+
+Delete container:
+docker rm my-maven-container
+
+Delete image:
+docker rmi my-maven-app
+
+View logs:
+docker logs my-maven-container
+
+Enter container:
+docker exec -it my-maven-container bash
+
+Run in background:
+docker run -d --name my-maven-container my-maven-app
+
+Check resource usage:
+docker stats
+
+
+WEB MAVEN PROJECT
+-----------------
+
+1. Clone repository
+git clone <repo-url>
+
+2. Enter project
+cd <repo-name>
+
+3. Create feature branch
+git checkout -b feature/web-change
+
+4. Make changes
+
+5. Add, commit and push
+git add .
+git commit -m "added feature"
+git push origin feature/web-change
+
+6. Switch to main
+git checkout main
+
+7. Merge
+git merge feature/web-change
+
+8. Push main
+git push origin main
+
+
+WEB MAVEN BUILD
+---------------
+
+Eclipse:
+Right-click project
+-> Run As
+-> Maven build...
+-> Goals: package
+-> Run
+
+This produces a WAR file in target/.
+
+
+TOMCAT
+------
+
+Eclipse:
+Window
+-> Show View
+-> Other
+-> Server
+-> Servers
+
+New Server
+-> Apache
+-> Tomcat v9.0
+
+Browse to the Tomcat folder.
+
+Add web project to server.
+
+Start server.
+
+Run As
+-> Run on Server
+
+Browser:
+http://localhost:8080/<project-name>/
+
+
+WEB DOCKER
+----------
+
+Dockerfile:
+
+FROM tomcat:9.0
+COPY target/*.war /usr/local/tomcat/webapps/
+
+Build image:
+docker build -t my-web-app .
+
+Run container with port mapping:
+docker run -p 8080:8080 --name my-web-container my-web-app
+
+Open:
+http://localhost:8080/<project-name>/
